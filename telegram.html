@@ -16,8 +16,7 @@
             background-color: #242f3e;
         }
 
-        #switch-mode-button,
-        .flag {
+        * {
             -moz-user-select: none;
             -webkit-user-select: none;
             -ms-user-select: none;
@@ -446,7 +445,6 @@
 
         // TODO Do not hide points on chart by info box
 
-        var ZOOM_FACTOR = w.devicePixelRatio || 1;
         var DOUBLE_PI = 2 * Math.PI;
         var CHART_HEIGHT = 290;
         var CHART_OFFSET_TOP = 4;
@@ -563,17 +561,13 @@
             this._init();
         }
 
-        Chart.prototype._initHeights = function() {
-            this._context.canvas.height =
-                CHART_HEIGHT * ZOOM_FACTOR;
-            this._navContext.canvas.height =
-                CHART_NAVIGATOR_HEIGHT * ZOOM_FACTOR;
-        };
-
         Chart.prototype.updateSize = function(modeOnly) {
+            var ZOOM_FACTOR = w.devicePixelRatio || 1;
             this._width = this._chartContainerEl.clientWidth;
+            this._context.canvas.height = CHART_HEIGHT * ZOOM_FACTOR;
             this._context.canvas.width = this._width * ZOOM_FACTOR;
             this._context.scale(ZOOM_FACTOR, ZOOM_FACTOR);
+            this._navContext.canvas.height = CHART_NAVIGATOR_HEIGHT * ZOOM_FACTOR;
             this._navContext.canvas.width = this._width * ZOOM_FACTOR;
             this._navContext.scale(ZOOM_FACTOR, ZOOM_FACTOR);
             var navigatorStep = this._width / (this._columnsNumber - 1);
@@ -962,8 +956,6 @@
 
             this._chartsEl.appendChild(chartEl);
 
-            this._initHeights();
-
             var x = [];
             this._lines = [];
             this._chartData.columns.forEach(function(column) {
@@ -1329,7 +1321,6 @@
             this._chartContainerEl = chartContainerEl;
             this._data = dates.map(getFormattedDate);
             this._maxGapsNumber = dates.length - 1;
-            console.log(this._maxGapsNumber);
         }
 
         ChartXData.prototype.setSection = function(widthPx, start) {
