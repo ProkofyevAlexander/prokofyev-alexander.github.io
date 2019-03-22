@@ -471,7 +471,7 @@
 
         var ANIMATION_TIME = 400;
         var RANGE_STEPS = 5.5;
-        var RANGE_BOUND_OFFSET = .5;
+        var RANGE_BOUND_OFFSET = .2;
         var RANGE_BORDER_OFFSET = .05;
 
         var X_DATA_WIDTH = 60;
@@ -552,11 +552,11 @@
         function Chart(chartsEl, chartData) {
             this._chartsEl = chartsEl;
             this._chartData = chartData;
-            this._move = null;
-            this._moveL = null;
-            this._moveR = null;
-            this._animationCanCall = true;
+            this._move =
+            this._moveL =
+            this._moveR =
             this._infoIndex = null;
+            this._animationCanCall = true;
 
             this._init();
         }
@@ -593,13 +593,9 @@
         };
 
         Chart.prototype._redrawChart = function() {
-
             var visibleLines = this._lines.filter(lineVisibilityFilter);
-
             var rangeInfo = this._getRangeInfo(visibleLines);
-
             this._animate(rangeInfo.updateRange ? rangeInfo : null);
-
             this._chartXData.setSection(this._widthPx, this._start);
         };
 
@@ -681,8 +677,7 @@
                 range = this._animationRange;
             }
 
-            var factor = (CHART_HEIGHT - CHART_OFFSET_TOP - CHART_OFFSET_BOTTOM)
-                / (range.max - range.min);
+            var factor = (CHART_HEIGHT - CHART_OFFSET_TOP - CHART_OFFSET_BOTTOM) / (range.max - range.min);
 
             var pointX;
             if (this._infoIndex !== null) {
@@ -693,7 +688,6 @@
                 this._context.moveTo(pointX, 0);
                 this._context.lineTo(pointX, CHART_HEIGHT);
                 this._context.stroke();
-
                 this._chartInfo.show(pointX, this._infoIndex);
             } else {
                 this._chartInfo.hide();
@@ -741,7 +735,6 @@
                     that._animationCanCall = true;
                     that._animate();
                 });
-
                 this._animationCanCall = false;
             }
         };
@@ -784,7 +777,6 @@
         };
 
         Chart.prototype._getNewRange = function(min, max) {
-
             var mx = max / (RANGE_STEPS - RANGE_BOUND_OFFSET * 2);
             var mn = min / (RANGE_STEPS - RANGE_BOUND_OFFSET * 2);
             var rangeStep = mx - mn;
@@ -795,29 +787,21 @@
             if (startFromZero) {
                 rangeStep = mx;
             }
-
             var n = 1;
             var order = Math.round(rangeStep).toString().length;
             if (order > 1) {
-                n = '5';
+                n = 5;
                 for (var i = 0; i < order - 2; i++) {
-                    n += '0';
+                    n *= 10;
                 }
-                n = parseInt(n);
                 rangeStep = Math.ceil(rangeStep / n) * n;
             }
-
-            var rangeMin = startFromZero
-                ? 0
-                : Math.floor((min - RANGE_BOUND_OFFSET * rangeStep) / n) * n;
+            var rangeMin = startFromZero ? 0 : Math.floor((min - RANGE_BOUND_OFFSET * rangeStep) / n) * n;
             var rangeMax = rangeMin + RANGE_STEPS * rangeStep;
-            var boundOffset = Math.round(
-                (RANGE_BOUND_OFFSET - RANGE_BORDER_OFFSET) * rangeStep
-            );
+            var boundOffset = Math.round((RANGE_BOUND_OFFSET - RANGE_BORDER_OFFSET) * rangeStep);
             var newRange = {
                 min: Math.round(rangeMin),
                 max: Math.round(rangeMax),
-
                 maxUpperBound: max + boundOffset,
                 maxBottomBound: max - boundOffset,
                 minUpperBound: min + boundOffset,
@@ -828,9 +812,7 @@
         };
 
         Chart.prototype._getChartY = function(max, factor, val) {
-            return Math.round(
-                factor * (max - val)
-            ) + CHART_OFFSET_TOP
+            return Math.round(factor * (max - val)) + CHART_OFFSET_TOP
         };
 
         Chart.prototype._redrawNavigator = function(modeOnly) {
@@ -854,13 +836,10 @@
             }
             this._lines
                 .filter(lineForDrawFilter)
-                // .filter(lineVisibilityFilter)
                 .forEach(this._drawNavigatorLine.bind(this, percent));
 
             if (percent < 1) {
-                w.requestAnimationFrame(function() {
-                    that._animateNavigator();
-                });
+                w.requestAnimationFrame(function() {that._animateNavigator();});
             }
         };
 
@@ -910,11 +889,7 @@
             // Chart container
             this._chartContainerEl = d.createElement('div');
             this._chartContainerEl.classList.add('chart__container');
-            this._chartContainerEl.style.height = px(
-                CHART_HEIGHT
-                + CHART_X_DATA_HEIGHT
-                + CHART_NAVIGATOR_HEIGHT
-            );
+            this._chartContainerEl.style.height = px(CHART_HEIGHT + CHART_X_DATA_HEIGHT + CHART_NAVIGATOR_HEIGHT);
 
             // Chart canvas
             var canvasEl = d.createElement('canvas');
@@ -1039,13 +1014,11 @@
             el.style.borderRightWidth = px(CHART_NAVIGATOR_MASK_VERTICAL_BORDER);
             el.style.borderTopWidth = px(CHART_NAVIGATOR_MASK_HORIZONTAL_BORDER);
             el.style.borderBottomWidth = px(CHART_NAVIGATOR_MASK_HORIZONTAL_BORDER);
-            el.style.height =
-                px(CHART_NAVIGATOR_HEIGHT - CHART_NAVIGATOR_MASK_HORIZONTAL_BORDER * 2);
+            el.style.height = px(CHART_NAVIGATOR_HEIGHT - CHART_NAVIGATOR_MASK_HORIZONTAL_BORDER * 2);
             el.addEventListener('mousedown', this._maskMouseDown.bind(this, false));
             el.addEventListener('touchstart', this._maskMouseDown.bind(this, false));
 
-            var maskResizeOffset = CHART_NAVIGATOR_MASK_VERTICAL_BORDER
-                + (CHART_NAVIGATOR_MASK_RESIZE_WIDTH - CHART_NAVIGATOR_MASK_VERTICAL_BORDER);
+            var maskResizeOffset = CHART_NAVIGATOR_MASK_VERTICAL_BORDER + (CHART_NAVIGATOR_MASK_RESIZE_WIDTH - CHART_NAVIGATOR_MASK_VERTICAL_BORDER);
             var maskL = d.createElement('div');
             maskL.classList.add('chart__navigator-mask-center-resize');
             maskL.style.width = px(CHART_NAVIGATOR_MASK_RESIZE_WIDTH);
@@ -1090,8 +1063,8 @@
         Chart.prototype._mouseUp = function(e) {
             e.stopPropagation();
             finishMaskMove(e);
-            this._move = null;
-            this._moveL = null;
+            this._move =
+            this._moveL =
             this._moveR = null;
         };
 
@@ -1158,13 +1131,11 @@
                 }
             }
             this._setStartAndEnd(start, end);
-            // TODO w.requestAnimationFrame() ?
             this._updateNavigatorMask();
             this._redrawChart();
         };
 
         Chart.prototype._updateNavigatorMask = function() {
-            // TODO May be can be optimized by using of _xPx
             var start = percent(this._start);
             var end = percent(1 - this._end);
             this._navMaskLEl.style.width = start;
@@ -1241,12 +1212,7 @@
                 this._lines[lineIndex].alphaStartTime = Date.now();
             }
             flag.classList.add('flag_animate');
-            setTimeout(
-                function() {
-                    flag.classList.remove('flag_animate');
-                },
-                500
-            );
+            setTimeout(function() {flag.classList.remove('flag_animate');}, 500);
             this._updateVisibility();
             this._redraw();
         };
@@ -1313,8 +1279,7 @@
                 this._el.style.removeProperty('left');
                 this._el.style.right = px(x);
             }
-            this._el.style.transform =
-                'translate(' + percent(x / this._width) + ')';
+            this._el.style.transform = 'translate(' + percent(x / this._width) + ')';
             this._el.style.display = 'block';
         };
 
