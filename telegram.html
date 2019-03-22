@@ -1008,6 +1008,11 @@
             var step = this._widthPx / this._columnsNumber;
             var percent = (this._start * this._widthPx + x) / (this._widthPx + step);
             this._infoIndex = Math.round(this._columnsNumber * percent);
+            if (this._infoIndex > this._columnsNumber - 1) {
+                this._infoIndex = this._columnsNumber - 1;
+            } else if (this._infoIndex < 0) {
+                this._infoIndex = 0;
+            }
             this._redrawChart();
         };
 
