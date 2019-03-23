@@ -818,15 +818,16 @@
             }
             var rangeMin = startFromZero ? 0 : Math.floor((min - RANGE_BOUND_OFFSET * rangeStep) / n) * n;
             var rangeMax = rangeMin + RANGE_STEPS * rangeStep;
-            var boundOffset = Math.round((RANGE_BOUND_OFFSET - RANGE_BORDER_OFFSET) * rangeStep);
+            var boundOffset = Math.round(RANGE_BOUND_OFFSET * rangeStep);
+            var boundOutOffset = Math.round((RANGE_BOUND_OFFSET - RANGE_BORDER_OFFSET) * rangeStep);
             return {
                 min: Math.round(rangeMin),
                 max: Math.round(rangeMax),
                 step: rangeStep,
-                maxUpperBound: max + boundOffset,
+                maxUpperBound: max + boundOutOffset,
                 maxBottomBound: max - boundOffset,
                 minUpperBound: min + boundOffset,
-                minBottomBound: min - boundOffset
+                minBottomBound: min - boundOutOffset
             };
         };
 
