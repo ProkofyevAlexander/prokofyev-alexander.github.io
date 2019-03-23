@@ -757,6 +757,7 @@
             var min = Infinity;
             var max = -Infinity;
             var previousRange;
+            var updateRange = false;
             lines.forEach(function(line) {
                 for (var i = that._startIndex; i < that._endIndex; i++) {
                     min = min > line.items[i] ? line.items[i] : min;
@@ -766,6 +767,7 @@
             if (!this._currentRange || min === Infinity) {
                 if (min !== Infinity) {
                     this._currentRange = this._getNewRange(min, max);
+                    this._chartYData.setRange(this._currentRange.min, this._currentRange.step);
                 }
                 return {
                     updateRange: true,
@@ -773,14 +775,19 @@
                     currentRange: this._currentRange
                 };
             }
-            var updateRange =
+            var findNewRange =
                 this._currentRange.maxUpperBound < max
                 || this._currentRange.maxBottomBound > max
                 || this._currentRange.minBottomBound > min
                 || this._currentRange.minUpperBound < min;
-            if (updateRange) {
-                previousRange = this._currentRange;
-                this._currentRange = this._getNewRange(min, max);
+            if (findNewRange) {
+                var newRange = this._getNewRange(min, max);
+                updateRange = newRange.min !== this._currentRange.min || newRange.max !== this._currentRange.max;
+                if (updateRange) {
+                    previousRange = this._currentRange;
+                    this._currentRange = newRange;
+                    this._chartYData.setRange(newRange.min, newRange.step);
+                }
             }
             return {
                 updateRange: updateRange,
@@ -812,16 +819,15 @@
             var rangeMin = startFromZero ? 0 : Math.floor((min - RANGE_BOUND_OFFSET * rangeStep) / n) * n;
             var rangeMax = rangeMin + RANGE_STEPS * rangeStep;
             var boundOffset = Math.round((RANGE_BOUND_OFFSET - RANGE_BORDER_OFFSET) * rangeStep);
-            var newRange = {
+            return {
                 min: Math.round(rangeMin),
                 max: Math.round(rangeMax),
+                step: rangeStep,
                 maxUpperBound: max + boundOffset,
                 maxBottomBound: max - boundOffset,
                 minUpperBound: min + boundOffset,
                 minBottomBound: min - boundOffset
             };
-            this._chartYData.setRange(rangeMin, rangeStep);
-            return newRange;
         };
 
         Chart.prototype._getChartY = function(max, factor, val) {
